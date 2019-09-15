@@ -1,4 +1,3 @@
-const rootFolder = "C:\\Users\\Praba\\OneDrive\\Desktop\\Trekking";
 const fs = require('fs');
 const util = require('util');
 const readdir = util.promisify(fs.readdir);
@@ -13,31 +12,30 @@ const getDateTimeFromFileName = (file) => {
         return "";
     }
 }
-const getStoreObject = async (rootFolder) => {
-    let folders = await readdir(rootFolder);
-    const places = folders.map(async folder => {
-        const files = await readdir(rootFolder + "\\" + folder);
-        const timeline = files.map(file => ({
-            photo: "https://cdn.jsdelivr.net/gh/southindiantrekkers/Trekked-Places-1000-Pixels/" + folder + "/" + file.replace('.jpg', '') + "-1000x1000.jpg",
-            caption: "Viñales, Pinar del Río, Cuba",
-            subcaption: "Photo by Simon Matzinger on Unsplash",
-            thumbnail: "https://cdn.jsdelivr.net/gh/southindiantrekkers/Trekked-Places-500-Pixels/" + folder + "/" + file.replace('.jpg', '') + "-500x500.jpg",
-        }));
-        console.log(timeline)
-        return {
-            "title": folder,
-            "brief": "",
-            "image": "",
-            "description": "",
-            "date": "",
-            "category": "",
-            "keywords": [],
-            "timeline": timeline,
-        };
-    });
-    return await Promise.all(places)
+const getObject = async (rootFolder) => {
+    const folder = rootFolder.split('\\').pop();
+    const files = await readdir(rootFolder);
+    const timeline = files.map(file => ({
+        photo: "https://cdn.jsdelivr.net/gh/southindiantrekkers/Trekked-Places-1000-Pixels/" + folder + "/" + file.replace('.jpg', '') + "-1000x1000.jpg",
+        caption: "",
+        subcaption: "",
+        date: getDateTimeFromFileName(file),
+        thumbnail: "https://cdn.jsdelivr.net/gh/southindiantrekkers/Trekked-Places-500-Pixels/" + folder + "/" + file.replace('.jpg', '') + "-500x500.jpg",
+    }));
+    // console.log(timeline)
+    return {
+        "title": folder,
+        "brief": "",
+        "image": timeline[0],
+        "description": "",
+        "date": "",
+        "category": "",
+        "keywords": [],
+        "timeline": timeline,
+    };
 }
 (async () => {
-    const t = await getStoreObject(rootFolder);
-    fs.writeFileSync("store.json", JSON.stringify(t))
+    const rootFolder = "C:\\Users\\Praba\\OneDrive\\Desktop\\Trekking\\Short Trek, Puli Gundu";
+    const t = await getObject(rootFolder);
+    fs.writeFileSync("object.json", JSON.stringify(t))
 })()
